@@ -5,7 +5,7 @@ from config import api_token
 class DataRepos:
     def __init__(self, owner):
         self.owner = owner
-        self.api_base_ulr = 'https://api.github.com'
+        self.api_base_url = 'https://api.github.com'
         self.api_token = api_token
         self.headers = {
                             'Authorization': f'Bearer {self.api_token}',
@@ -18,10 +18,14 @@ class DataRepos:
         page_num = 1
 
         while True:
-            url_page = f'{self.api_base_ulr}/users/{self.owner}?page={page_num}'
+            url_page = f'{self.api_base_url}/users/{self.owner}/repos?page={page_num}'
             response = requests.get(url_page, headers=self.headers)
+
+            if response.status_code != 200:
+                print(f'Erro ao buscar repositórios: {response.status_code} - {response.json()}')
+                break
+
             if len(response.json())==0:
-                repos_list.append(None)
                 print(page_num)
                 break
 
@@ -51,11 +55,11 @@ def main():
     Dados = DataRepos('amzn')
     lista_repos = Dados.list_repos()
     lista_nomes = Dados.information_repos(lista_repos, 'name')
-    print(lista_nomes)
+    #print(lista_nomes)
     lista_linguagens = Dados.information_repos(lista_repos, 'language')
-    print(lista_linguagens)
+    #print(lista_linguagens)
     dataframe = Dados.create_df(lista_nomes, 'Nomes dos repos', lista_linguagens, 'Linguagens')
-    dataframe 
+    print(dataframe)
 
 main()
 
